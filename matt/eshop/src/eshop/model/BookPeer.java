@@ -13,26 +13,20 @@ public class BookPeer {
     ArrayList<Book> books = new ArrayList<Book>();
     Connection connection = dataManager.getConnection();
     if (connection != null) {
-      try {
-        Statement s = connection.createStatement();
+      try (Statement s = connection.createStatement()) {
         String sql = "select book_id, title, author, price from books"
             + " where title like '%" + keyword.trim() + "%'"
             + " or author like '%" + keyword.trim() + "%'";
-        try {
-          ResultSet rs = s.executeQuery(sql);
-          try {
-            while (rs.next()) {
-              Book book = new Book();
-              book.setId(rs.getString(1));
-              book.setTitle(rs.getString(2));
-              book.setAuthor(rs.getString(3));
-              book.setPrice(rs.getDouble(4));
-              books.add(book);
-              }
+        try (ResultSet rs = s.executeQuery(sql)) {
+          while (rs.next()) {
+            Book book = new Book();
+            book.setId(rs.getString(1));
+            book.setTitle(rs.getString(2));
+            book.setAuthor(rs.getString(3));
+            book.setPrice(rs.getDouble(4));
+            books.add(book);
             }
-          finally { rs.close(); }
           }
-        finally { s.close(); }
         }
       catch (SQLException e) {
         System.out.println("Could not search for books:" + e.getMessage());
